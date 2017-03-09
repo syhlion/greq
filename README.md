@@ -20,8 +20,9 @@ func main(){
     //need import https://github.com/syhlion/requestwork.v2
     worker:=requestwork.New(50)
 
-    //GET
     client:=restclient.New(worker,15*time.Second)
+
+    //GET
     data,httpstatus,err:=client.Get("https://tw.yahoo.com",nil)
 
     //POST
