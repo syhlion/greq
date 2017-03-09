@@ -9,7 +9,7 @@ restful web service reqeust tool
 
 ## Install
 
-`go get github.com/syhlion/restclient`
+`go get github.com/syhlion/greq`
 
 
 ## Usage
