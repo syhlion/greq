@@ -1,6 +1,6 @@
 # restful web service client
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/syhlion/greq)](https://goreportcard.com/report/github.com/syhlion/greq)
+[![Go Report Card](https://goreportcard.com/badge/github.com/syhlion/greq)](https://goreportcard.com/report/github.com/syhlion/greq) 
 [![Build Status](https://travis-ci.org/syhlion/greq.svg?branch=master)](https://travis-ci.org/syhlion/greq)
 
 restful web service reqeust tool
