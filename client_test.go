@@ -136,7 +136,7 @@ func TestAddBasicAuth(t *testing.T) {
 
 	//test err response
 	client.SetBasicAuth("scott", "nofine")
-	data, s, err = client.Get(ts.URL, nil)
+	data, s, _ = client.Get(ts.URL, nil)
 	if s == http.StatusOK {
 		t.Fatalf("status fatal:%d ,body:%s", s, string(data))
 	}

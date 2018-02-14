@@ -29,6 +29,7 @@ type Client struct {
 	Host    string
 }
 
+//SetBasicAuth  set Basic auth
 func (c *Client) SetBasicAuth(username, password string) *Client {
 	auth := username + ":" + password
 	hash := base64.StdEncoding.EncodeToString([]byte(auth))
@@ -42,6 +43,8 @@ func (c *Client) SetHeader(key, value string) *Client {
 	c.Headers[key] = value
 	return c
 }
+
+//SetHost set host
 func (c *Client) SetHost(host string) *Client {
 
 	c.Host = host
