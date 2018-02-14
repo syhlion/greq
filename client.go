@@ -2,6 +2,7 @@ package greq
 
 import (
 	"context"
+	"encoding/base64"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -26,6 +27,13 @@ type Client struct {
 	Timeout time.Duration
 	Headers map[string]string
 	Host    string
+}
+
+func (c *Client) SetBasicAuth(username, password string) *Client {
+	auth := username + ":" + password
+	hash := base64.StdEncoding.EncodeToString([]byte(auth))
+	c.Headers["Authorization"] = "Basic" + hash
+	return c
 }
 
 //SetHeader set http header
