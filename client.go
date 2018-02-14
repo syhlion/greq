@@ -32,7 +32,7 @@ type Client struct {
 func (c *Client) SetBasicAuth(username, password string) *Client {
 	auth := username + ":" + password
 	hash := base64.StdEncoding.EncodeToString([]byte(auth))
-	c.Headers["Authorization"] = "Basic" + hash
+	c.Headers["Authorization"] = "Basic " + hash
 	return c
 }
 
