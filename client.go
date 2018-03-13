@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	requestwork "github.com/syhlion/requestwork.v2"
@@ -18,6 +19,7 @@ func New(worker *requestwork.Worker, timeout time.Duration) *Client {
 		Worker:  worker,
 		Timeout: timeout,
 		Headers: make(map[string]string),
+		lock:    &sync.RWMutex{},
 	}
 }
 
@@ -27,12 +29,15 @@ type Client struct {
 	Timeout time.Duration
 	Headers map[string]string
 	Host    string
+	lock    *sync.RWMutex
 }
 
 //SetBasicAuth  set Basic auth
 func (c *Client) SetBasicAuth(username, password string) *Client {
 	auth := username + ":" + password
 	hash := base64.StdEncoding.EncodeToString([]byte(auth))
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	c.Headers["Authorization"] = "Basic " + hash
 	return c
 }
@@ -40,12 +45,16 @@ func (c *Client) SetBasicAuth(username, password string) *Client {
 //SetHeader set http header
 func (c *Client) SetHeader(key, value string) *Client {
 	key = strings.Title(key)
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	c.Headers[key] = value
 	return c
 }
 
 //SetHost set host
 func (c *Client) SetHost(host string) *Client {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 
 	c.Host = host
 	return c
@@ -80,6 +89,8 @@ func (c *Client) Delete(url string, params url.Values) (data []byte, httpstatus 
 }
 
 func (c *Client) resolveHeaders(req *http.Request) {
+	c.lock.RLock()
+	c.lock.RUnlock()
 	for key, value := range c.Headers {
 		req.Header.Set(key, value)
 	}
