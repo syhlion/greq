@@ -19,7 +19,7 @@ import (
 
 var traceTemplete = "[greq] Rrequest url:{{.Url}}\t Method:{{.Method}}\t Param:{{.Param}}\n" +
 	"Response Body:{{.Body}}\n" +
-	"{{.Time}}"
+	"{{.Time}}\n\n"
 
 type Trace struct {
 	Url    string
