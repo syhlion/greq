@@ -121,7 +121,7 @@ func TestAddBasicAuth(t *testing.T) {
 	worker = requestwork.New(10)
 	ts := httptest.NewServer(http.HandlerFunc(basicAuthHandler))
 	defer ts.Close()
-	client := New(worker, 15*time.Second)
+	client := New(worker, 15*time.Second, false)
 	client.SetBasicAuth("scott", "fine")
 	data, s, err := client.Get(ts.URL, nil)
 	if err != nil {
@@ -150,7 +150,7 @@ func TestGet(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(getHandler))
 	defer ts.Close()
 
-	client := New(worker, 15*time.Second)
+	client := New(worker, 15*time.Second, false)
 	v := url.Values{}
 	v.Set("key", "TEST_HELLO")
 	data, s, err := client.Get(ts.URL, v)
@@ -169,7 +169,7 @@ func TestPost(t *testing.T) {
 	worker = requestwork.New(10)
 	ts := httptest.NewServer(http.HandlerFunc(postHandler))
 	defer ts.Close()
-	client := New(worker, 15*time.Second)
+	client := New(worker, 15*time.Second, false)
 	v := url.Values{}
 	v.Set("key", "TEST_HELLO")
 	data, s, err := client.Post(ts.URL, v)
@@ -187,7 +187,7 @@ func TestPut(t *testing.T) {
 	worker = requestwork.New(10)
 	ts := httptest.NewServer(http.HandlerFunc(putHandler))
 	defer ts.Close()
-	client := New(worker, 15*time.Second)
+	client := New(worker, 15*time.Second, false)
 	v := url.Values{}
 	v.Set("key", "TEST_HELLO")
 	data, s, err := client.Put(ts.URL, v)
@@ -201,11 +201,19 @@ func TestPut(t *testing.T) {
 		t.Fatal("body fatal :", string(data))
 	}
 }
+func TestGoogleTrace(t *testing.T) {
+	worker = requestwork.New(10)
+	client := New(worker, 15*time.Second, true)
+	_, _, err := client.Get("https://www.google.com", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
 func TestDelete(t *testing.T) {
 	worker = requestwork.New(10)
 	ts := httptest.NewServer(http.HandlerFunc(deleteHandler))
 	defer ts.Close()
-	client := New(worker, 15*time.Second)
+	client := New(worker, 15*time.Second, false)
 	v := url.Values{}
 	v.Set("key", "TEST_HELLO")
 	data, s, err := client.Delete(ts.URL, v)
