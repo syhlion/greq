@@ -3,7 +3,9 @@ package greq
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptrace"
 	"net/url"
@@ -34,11 +36,51 @@ type Trace struct {
 	Total            time.Duration `json:"total"`
 }
 
+var ip string
+
+func getExternalIP() (string, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+	for _, iface := range ifaces {
+		if iface.Flags&net.FlagUp == 0 {
+			continue // interface down
+		}
+		if iface.Flags&net.FlagLoopback != 0 {
+			continue // loopback interface
+		}
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return "", err
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			if ip == nil || ip.IsLoopback() {
+				continue
+			}
+			ip = ip.To4()
+			if ip == nil {
+				continue // not an ipv4 address
+			}
+			return ip.String(), nil
+		}
+	}
+	return "", errors.New("are you connected to the network?")
+}
+
 func init() {
 	log.SetFormatter(&log.JSONFormatter{})
 
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
+	ip, _ = getExternalIP()
 }
 
 //New return http client
@@ -154,6 +196,8 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 			stat.StartTransfer = t4.Sub(t0)
 			stat.Total = t5.Sub(t0)
 			log.WithFields(log.Fields{
+				"ip":                ip,
+				"name":              "syhlion/greq",
 				"param":             stat.Param,
 				"url":               stat.Url,
 				"method":            stat.Method,
@@ -168,7 +212,7 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 				"pre_transfer":      stat.PreTransfer.String(),
 				"start_transfer":    stat.StartTransfer.String(),
 				"total":             stat.Total.String(),
-			}).Debug("[greq] trace")
+			}).Debug("http trace")
 
 		}()
 		trace = &httptrace.ClientTrace{
