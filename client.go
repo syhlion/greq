@@ -225,9 +225,6 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 				}
 			},
 			ConnectDone: func(net, addr string, err error) {
-				if err != nil {
-					log.Fatalf("unable to connect to host %v: %v", addr, err)
-				}
 				t2 = time.Now()
 
 			},
