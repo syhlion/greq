@@ -185,16 +185,28 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 			stat.Url = req.URL.String()
 			stat.Method = req.Method
 			stat.Body = string(data)
-			stat.DNSLookup = t1.Sub(t0)
-			stat.TCPConnection = t2.Sub(t1)
-			stat.TLSHandshake = t3.Sub(t2)
-			stat.ServerProcessing = t4.Sub(t3)
-			stat.ContentTransfer = t5.Sub(t4)
-			stat.NameLookup = t1.Sub(t0)
-			stat.Connect = t2.Sub(t0)
-			stat.PreTransfer = t3.Sub(t0)
-			stat.StartTransfer = t4.Sub(t0)
-			stat.Total = t5.Sub(t0)
+			switch req.URL.Scheme {
+			case "https":
+				stat.DNSLookup = t1.Sub(t0)
+				stat.TCPConnection = t2.Sub(t1)
+				stat.TLSHandshake = t3.Sub(t2)
+				stat.ServerProcessing = t4.Sub(t3)
+				stat.ContentTransfer = t5.Sub(t4)
+				stat.NameLookup = t1.Sub(t0)
+				stat.Connect = t2.Sub(t0)
+				stat.PreTransfer = t3.Sub(t0)
+				stat.StartTransfer = t4.Sub(t0)
+				stat.Total = t5.Sub(t0)
+			case "http":
+				stat.DNSLookup = t1.Sub(t0)
+				stat.TCPConnection = t3.Sub(t1)
+				stat.ServerProcessing = t4.Sub(t3)
+				stat.ContentTransfer = t5.Sub(t4)
+				stat.NameLookup = t1.Sub(t0)
+				stat.Connect = t3.Sub(t0)
+				stat.StartTransfer = t4.Sub(t0)
+				stat.Total = t5.Sub(t0)
+			}
 			log.WithFields(log.Fields{
 				"ip":                ip,
 				"name":              "syhlion/greq",
