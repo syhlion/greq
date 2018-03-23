@@ -173,11 +173,12 @@ func (c *Client) resolveHeaders(req *http.Request) {
 
 func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (data []byte, httpstatus int, err error) {
 	var (
-		body                   []byte
-		status                 int
-		trace                  *httptrace.ClientTrace
-		t0, t1, t2, t3, t4, t5 time.Time
+		body           []byte
+		status         int
+		trace          *httptrace.ClientTrace
+		t0, t3, t4, t5 time.Time
 	)
+	t0 = time.Now()
 	if c.debug {
 		var stat Trace
 		defer func() {
@@ -185,61 +186,29 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 			stat.Url = req.URL.String()
 			stat.Method = req.Method
 			stat.Body = string(data)
-			switch req.URL.Scheme {
-			case "https":
-				stat.DNSLookup = t1.Sub(t0)
-				stat.TCPConnection = t2.Sub(t1)
-				stat.TLSHandshake = t3.Sub(t2)
-				stat.ServerProcessing = t4.Sub(t3)
-				stat.ContentTransfer = t5.Sub(t4)
-				stat.NameLookup = t1.Sub(t0)
-				stat.Connect = t2.Sub(t0)
-				stat.PreTransfer = t3.Sub(t0)
-				stat.StartTransfer = t4.Sub(t0)
-				stat.Total = t5.Sub(t0)
-			case "http":
-				stat.DNSLookup = t1.Sub(t0)
-				stat.TCPConnection = t3.Sub(t1)
-				stat.ServerProcessing = t4.Sub(t3)
-				stat.ContentTransfer = t5.Sub(t4)
-				stat.NameLookup = t1.Sub(t0)
-				stat.Connect = t3.Sub(t0)
-				stat.StartTransfer = t4.Sub(t0)
-				stat.Total = t5.Sub(t0)
-			}
+			stat.TCPConnection = t3.Sub(t0)
+			stat.ServerProcessing = t4.Sub(t3)
+			stat.ContentTransfer = t5.Sub(t4)
+			stat.Connect = t3.Sub(t0)
+			stat.StartTransfer = t4.Sub(t0)
+			stat.Total = t5.Sub(t0)
 			log.WithFields(log.Fields{
-				"ip":                ip,
-				"name":              "syhlion/greq",
-				"param":             stat.Param,
-				"url":               stat.Url,
-				"method":            stat.Method,
-				"body":              stat.Body,
-				"dns_lookup":        stat.DNSLookup.Seconds(),
-				"tcp_connection":    stat.TCPConnection.Seconds(),
-				"tls_handshake":     stat.TLSHandshake.Seconds(),
-				"server_processing": stat.ServerProcessing.Seconds(),
-				"content_transfer":  stat.ContentTransfer.Seconds(),
-				"name_lookup":       stat.NameLookup.Seconds(),
-				"connect":           stat.Connect.Seconds(),
-				"pre_transfer":      stat.PreTransfer.Seconds(),
-				"start_transfer":    stat.StartTransfer.Seconds(),
-				"total":             stat.Total.Seconds(),
+				"ip":     ip,
+				"name":   "syhlion/greq",
+				"param":  stat.Param,
+				"url":    stat.Url,
+				"method": stat.Method,
+				//	"body":              stat.Body,
+				"tcp_connection":    stat.TCPConnection.String(),
+				"server_processing": stat.ServerProcessing.String(),
+				"content_transfer":  stat.ContentTransfer.String(),
+				"connect":           stat.Connect.String(),
+				"start_transfer":    stat.StartTransfer.String(),
+				"total":             stat.Total.String(),
 			}).Debug("http trace")
 
 		}()
 		trace = &httptrace.ClientTrace{
-			DNSStart: func(_ httptrace.DNSStartInfo) { t0 = time.Now() },
-			DNSDone:  func(_ httptrace.DNSDoneInfo) { t1 = time.Now() },
-			ConnectStart: func(_, _ string) {
-				if t1.IsZero() {
-					// connecting to IP
-					t1 = time.Now()
-				}
-			},
-			ConnectDone: func(net, addr string, err error) {
-				t2 = time.Now()
-
-			},
 			GotConn:              func(_ httptrace.GotConnInfo) { t3 = time.Now() },
 			GotFirstResponseByte: func() { t4 = time.Now() },
 		}
@@ -266,9 +235,6 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 		defer func() {
 			resp.Body.Close()
 			t5 = time.Now()
-			if t0.IsZero() {
-				t0 = t1
-			}
 		}()
 		status = resp.StatusCode
 		body, readErr = ioutil.ReadAll(resp.Body)
