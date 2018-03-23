@@ -145,6 +145,19 @@ func TestAddBasicAuth(t *testing.T) {
 	}
 }
 
+func BenchmarkGet(b *testing.B) {
+
+	worker = requestwork.New(10)
+	ts := httptest.NewServer(http.HandlerFunc(getHandler))
+	defer ts.Close()
+	client := New(worker, 15*time.Second, false)
+	v := url.Values{}
+	v.Set("key", "TEST_HELLO")
+	for i := 0; i < b.N; i++ {
+		client.Get(ts.URL, v)
+	}
+}
+
 func TestGet(t *testing.T) {
 	worker = requestwork.New(10)
 	ts := httptest.NewServer(http.HandlerFunc(getHandler))
