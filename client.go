@@ -141,10 +141,30 @@ func (c *Client) Get(url string, params url.Values) (data []byte, httpstatus int
 	return c.resolveRequest(req, params, err)
 
 }
+func (c *Client) GetWithOnceHeader(url string, params url.Values, headers map[string]string) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
+	if err != nil {
+		return
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+	return c.resolveRequest(req, params, err)
+}
 
 //Post http method post
 func (c *Client) Post(url string, params url.Values) (data []byte, httpstatus int, err error) {
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
+	return c.resolveRequest(req, params, err)
+}
+func (c *Client) PostWithOnceHeader(url string, params url.Values, headers map[string]string) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
+	if err != nil {
+		return
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
 	return c.resolveRequest(req, params, err)
 }
 
@@ -153,10 +173,31 @@ func (c *Client) Put(url string, params url.Values) (data []byte, httpstatus int
 	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(params.Encode()))
 	return c.resolveRequest(req, params, err)
 }
+func (c *Client) PutWithOnceHeader(url string, params url.Values, headers map[string]string) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
+	if err != nil {
+		return
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
+	return c.resolveRequest(req, params, err)
+}
 
 //Delete http method Delete
 func (c *Client) Delete(url string, params url.Values) (data []byte, httpstatus int, err error) {
 	req, err := http.NewRequest(http.MethodDelete, url, strings.NewReader(params.Encode()))
+	return c.resolveRequest(req, params, err)
+}
+func (c *Client) DeleteWithOnceHeader(url string, params url.Values, headers map[string]string) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
+	if err != nil {
+		return
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
 	return c.resolveRequest(req, params, err)
 }
 
