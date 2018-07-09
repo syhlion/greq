@@ -1,9 +1,11 @@
 package greq
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"errors"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -157,6 +159,21 @@ func (c *Client) Post(url string, params url.Values) (data []byte, httpstatus in
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
 	return c.resolveRequest(req, params, err)
 }
+func (c *Client) PostRaw(url string, body io.Reader) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodPost, url, body)
+	return c.resolveRawRequest(req, body, err)
+}
+func (c *Client) PostRawWithOnceHeader(url string, body io.Reader, headers map[string]string) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodPost, url, body)
+	if err != nil {
+		return
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+	return c.resolveRawRequest(req, body, err)
+}
+
 func (c *Client) PostWithOnceHeader(url string, params url.Values, headers map[string]string) (data []byte, httpstatus int, err error) {
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
 	if err != nil {
@@ -212,6 +229,88 @@ func (c *Client) resolveHeaders(req *http.Request) {
 	}
 }
 
+func (c *Client) resolveRawRequest(req *http.Request, bb io.Reader, e error) (data []byte, httpstatus int, err error) {
+	var (
+		body           []byte
+		status         int
+		trace          *httptrace.ClientTrace
+		t0, t3, t4, t5 time.Time
+	)
+	t0 = time.Now()
+	if c.debug {
+		var stat Trace
+		defer func() {
+			buf := new(bytes.Buffer)
+			buf.ReadFrom(bb)
+			stat.Param = buf.String()
+			stat.Url = req.URL.String()
+			stat.Method = req.Method
+			stat.Body = string(data)
+			stat.TCPConnection = t3.Sub(t0)
+			stat.ServerProcessing = t4.Sub(t3)
+			stat.ContentTransfer = t5.Sub(t4)
+			stat.Connect = t3.Sub(t0)
+			stat.StartTransfer = t4.Sub(t0)
+			stat.Total = t5.Sub(t0)
+			log.WithFields(log.Fields{
+				"ip":     ip,
+				"name":   "syhlion/greq",
+				"param":  stat.Param,
+				"url":    stat.Url,
+				"method": stat.Method,
+				//	"body":              stat.Body,
+				"tcp_connection":    stat.TCPConnection.String(),
+				"server_processing": stat.ServerProcessing.String(),
+				"content_transfer":  stat.ContentTransfer.String(),
+				"connect":           stat.Connect.String(),
+				"start_transfer":    stat.StartTransfer.String(),
+				"total":             stat.Total.String(),
+			}).Debug("http trace")
+
+		}()
+		trace = &httptrace.ClientTrace{
+			GotConn:              func(_ httptrace.GotConnInfo) { t3 = time.Now() },
+			GotFirstResponseByte: func() { t4 = time.Now() },
+		}
+		req = req.WithContext(httptrace.WithClientTrace(context.Background(), trace))
+	}
+	if e != nil {
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+
+	defer cancel()
+	c.resolveHeaders(req)
+
+	switch req.Method {
+	case "PUT", "POST", "DELETE":
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+	}
+
+	err = c.worker.Execute(ctx, req, func(resp *http.Response, err error) (er error) {
+		if err != nil {
+			return err
+		}
+		var readErr error
+		defer func() {
+			resp.Body.Close()
+			t5 = time.Now()
+		}()
+		status = resp.StatusCode
+		body, readErr = ioutil.ReadAll(resp.Body)
+		if readErr != nil {
+			return readErr
+		}
+		return
+	})
+	if err != nil {
+		return
+	}
+	data = body
+	httpstatus = status
+	return
+
+}
 func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (data []byte, httpstatus int, err error) {
 	var (
 		body           []byte
