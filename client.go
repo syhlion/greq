@@ -282,11 +282,6 @@ func (c *Client) resolveRawRequest(req *http.Request, bb io.Reader, e error) (da
 	defer cancel()
 	c.resolveHeaders(req)
 
-	switch req.Method {
-	case "PUT", "POST", "DELETE":
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-	}
-
 	err = c.worker.Execute(ctx, req, func(resp *http.Response, err error) (er error) {
 		if err != nil {
 			return err
