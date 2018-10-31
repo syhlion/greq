@@ -220,7 +220,7 @@ func (c *Client) DeleteWithOnceHeader(url string, params url.Values, headers map
 
 func (c *Client) resolveHeaders(req *http.Request) {
 	c.lock.RLock()
-	c.lock.RUnlock()
+	defer c.lock.RUnlock()
 	for key, value := range c.headers {
 		req.Header.Set(key, value)
 	}
