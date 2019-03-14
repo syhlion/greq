@@ -144,7 +144,10 @@ func (c *Client) Get(url string, params url.Values) (data []byte, httpstatus int
 
 }
 func (c *Client) GetWithOnceHeader(url string, params url.Values, headers map[string]string) (data []byte, httpstatus int, err error) {
-	req, err := http.NewRequest(http.MethodGet, url, strings.NewReader(params.Encode()))
+	if params != nil {
+		url += "?" + params.Encode()
+	}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return
 	}
