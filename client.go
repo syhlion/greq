@@ -2,6 +2,7 @@ package greq
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
 	"encoding/base64"
 	"errors"
@@ -302,9 +303,22 @@ func (c *Client) resolveRawRequest(req *http.Request, bb io.Reader, e error) (da
 			t5 = time.Now()
 		}()
 		status = resp.StatusCode
-		body, readErr = ioutil.ReadAll(resp.Body)
-		if readErr != nil {
-			return readErr
+		switch resp.Header.Get("Content-Encoding") {
+		case "gzip":
+			reader, err := gzip.NewReader(resp.Body)
+			if err != nil {
+				return err
+			}
+			defer reader.Close()
+			body, readErr = ioutil.ReadAll(reader)
+			if readErr != nil {
+				return readErr
+			}
+		default:
+			body, readErr = ioutil.ReadAll(resp.Body)
+			if readErr != nil {
+				return readErr
+			}
 		}
 		return
 	})
@@ -382,9 +396,22 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 			t5 = time.Now()
 		}()
 		status = resp.StatusCode
-		body, readErr = ioutil.ReadAll(resp.Body)
-		if readErr != nil {
-			return readErr
+		switch resp.Header.Get("Content-Encoding") {
+		case "gzip":
+			reader, err := gzip.NewReader(resp.Body)
+			if err != nil {
+				return err
+			}
+			defer reader.Close()
+			body, readErr = ioutil.ReadAll(reader)
+			if readErr != nil {
+				return readErr
+			}
+		default:
+			body, readErr = ioutil.ReadAll(resp.Body)
+			if readErr != nil {
+				return readErr
+			}
 		}
 		return
 	})
