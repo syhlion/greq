@@ -22,8 +22,9 @@ func main(){
 
     //need import https://github.com/syhlion/requestwork.v2
     worker:=requestwork.New(50)
+    debug:=true
 
-    client:=greq.New(worker,15*time.Second)
+    client:=greq.New(worker,15*time.Second,debug)
 
     //GET
     data,httpstatus,err:=client.Get("https://tw.yahoo.com",nil)
