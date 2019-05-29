@@ -240,6 +240,7 @@ func (c *Client) resolveRawRequest(req *http.Request, bb io.Reader, e error) (da
 		trace          *httptrace.ClientTrace
 		t0, t3, t4, t5 time.Time
 	)
+	req.Close = true
 	t0 = time.Now()
 	if c.debug {
 		var stat Trace
@@ -337,6 +338,7 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 		trace          *httptrace.ClientTrace
 		t0, t3, t4, t5 time.Time
 	)
+	req.Close = true
 	t0 = time.Now()
 	if c.debug {
 		var stat Trace
