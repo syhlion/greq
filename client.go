@@ -293,8 +293,9 @@ func (c *Client) resolveRawRequest(req *http.Request, bb io.Reader, e error) (da
 			req.Header.Set("Content-Type", "application/json")
 		}
 	}
+	req = req.WithContext(ctx)
 
-	err = c.worker.Execute(ctx, req, func(resp *http.Response, err error) (er error) {
+	err = c.worker.Execute(req, func(resp *http.Response, err error) (er error) {
 		if err != nil {
 			return err
 		}
@@ -387,8 +388,9 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 	case "PUT", "POST", "DELETE":
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 	}
+	req = req.WithContext(ctx)
 
-	err = c.worker.Execute(ctx, req, func(resp *http.Response, err error) (er error) {
+	err = c.worker.Execute(req, func(resp *http.Response, err error) (er error) {
 		if err != nil {
 			return err
 		}
