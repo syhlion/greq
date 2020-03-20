@@ -427,3 +427,7 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 	return
 
 }
+
+func (c *Client) ResolveRequest(req *http.Request, params url.Values, e error) (data []byte, httpstatus int, err error) {
+	return c.resolveRequest(req, params, err)
+}
