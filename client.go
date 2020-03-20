@@ -107,6 +107,10 @@ type Client struct {
 	debug   bool
 }
 
+func (c *Client) CheckRedircet(f func(req *http.Request, via []*http.Request) error) {
+	c.worker.CheckRedirect(f)
+}
+
 //SetBasicAuth  set Basic auth
 func (c *Client) SetBasicAuth(username, password string) *Client {
 	auth := username + ":" + password

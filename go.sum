@@ -11,5 +11,7 @@ github.com/syhlion/requestwork.v2 v0.0.0-20190904064736-d3df83afb4f9 h1:q0PoGeSl
 github.com/syhlion/requestwork.v2 v0.0.0-20190904064736-d3df83afb4f9/go.mod h1:q6aCogTDBcW9MLecaxRwrQIVF1okJ/rhG64soNrk8KE=
 github.com/syhlion/requestwork.v2 v0.0.0-20190912072657-a9b5fd6b5018 h1:f7GpZhsqi5XgFFUXn+/bBv2yq1XR2/j7ej19p9z5BUc=
 github.com/syhlion/requestwork.v2 v0.0.0-20190912072657-a9b5fd6b5018/go.mod h1:q6aCogTDBcW9MLecaxRwrQIVF1okJ/rhG64soNrk8KE=
+github.com/syhlion/requestwork.v2 v0.0.0-20200320012056-f7341b91b87f h1:RLNg1VV71TqY7s7mmXEcf+efSiGe35M6g75wg3Cvz6w=
+github.com/syhlion/requestwork.v2 v0.0.0-20200320012056-f7341b91b87f/go.mod h1:q6aCogTDBcW9MLecaxRwrQIVF1okJ/rhG64soNrk8KE=
 golang.org/x/sys v0.0.0-20180905080454-ebe1bf3edb33 h1:I6FyU15t786LL7oL/hn43zqTuEGr4PN7F4XJ1p4E3Y8=
 golang.org/x/sys v0.0.0-20180905080454-ebe1bf3edb33/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
