@@ -198,6 +198,10 @@ func (c *Client) Put(url string, params url.Values) (data []byte, httpstatus int
 	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(params.Encode()))
 	return c.resolveRequest(req, params, err)
 }
+func (c *Client) PutRaw(url string, body io.Reader) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodPut, url, body)
+	return c.resolveRawRequest(req, body, err)
+}
 func (c *Client) PutWithOnceHeader(url string, params url.Values, headers map[string]string) (data []byte, httpstatus int, err error) {
 	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(params.Encode()))
 	if err != nil {
