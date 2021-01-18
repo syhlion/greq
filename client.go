@@ -230,11 +230,11 @@ func (c *Client) Delete(url string, params url.Values) (data []byte, httpstatus 
 	return c.resolveRequest(req, params, err)
 }
 func (c *Client) DeleteRaw(url string, body io.Reader) (data []byte, httpstatus int, err error) {
-	req, err := http.NewRequest(http.MethodPut, url, body)
+	req, err := http.NewRequest(http.MethodDelete, url, body)
 	return c.resolveRawRequest(req, body, err)
 }
 func (c *Client) DeleteWithOnceHeader(url string, params url.Values, headers map[string]string) (data []byte, httpstatus int, err error) {
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(http.MethodDelete, url, strings.NewReader(params.Encode()))
 	if err != nil {
 		return
 	}
