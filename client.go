@@ -213,11 +213,25 @@ func (c *Client) PutWithOnceHeader(url string, params url.Values, headers map[st
 
 	return c.resolveRequest(req, params, err)
 }
+func (c *Client) PutRawWithOnceHeader(url string, body io.Reader, headers map[string]string) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodPut, url, body)
+	if err != nil {
+		return
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+	return c.resolveRawRequest(req, body, err)
+}
 
 //Delete http method Delete
 func (c *Client) Delete(url string, params url.Values) (data []byte, httpstatus int, err error) {
 	req, err := http.NewRequest(http.MethodDelete, url, strings.NewReader(params.Encode()))
 	return c.resolveRequest(req, params, err)
+}
+func (c *Client) DeleteRaw(url string, body io.Reader) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodPut, url, body)
+	return c.resolveRawRequest(req, body, err)
 }
 func (c *Client) DeleteWithOnceHeader(url string, params url.Values, headers map[string]string) (data []byte, httpstatus int, err error) {
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
@@ -228,6 +242,16 @@ func (c *Client) DeleteWithOnceHeader(url string, params url.Values, headers map
 		req.Header.Set(key, value)
 	}
 	return c.resolveRequest(req, params, err)
+}
+func (c *Client) DeleteRawWithOnceHeader(url string, body io.Reader, headers map[string]string) (data []byte, httpstatus int, err error) {
+	req, err := http.NewRequest(http.MethodDelete, url, body)
+	if err != nil {
+		return
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+	return c.resolveRawRequest(req, body, err)
 }
 
 func (c *Client) resolveHeaders(req *http.Request) {
