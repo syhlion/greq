@@ -463,3 +463,58 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 func (c *Client) ResolveRequest(req *http.Request, params url.Values, e error) (data []byte, httpstatus int, err error) {
 	return c.resolveRequest(req, params, err)
 }
+
+//ResolveTraceRequest 自定義 httptrace
+func (c *Client) ResolveTraceRequest(req *http.Request, trace *httptrace.ClientTrace) (data []byte, httpstatus int, err error) {
+	var (
+		body   []byte
+		status int
+	)
+	req.Close = true
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+
+	defer cancel()
+	c.resolveHeaders(req)
+
+	switch req.Method {
+	case "PUT", "POST", "DELETE":
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+	}
+	req = req.WithContext(ctx)
+	req = req.WithContext(httptrace.WithClientTrace(context.Background(), trace))
+
+	err = c.worker.Execute(req, func(resp *http.Response, err error) (er error) {
+		if err != nil {
+			return err
+		}
+		var readErr error
+		defer func() {
+			resp.Body.Close()
+		}()
+		status = resp.StatusCode
+		switch resp.Header.Get("Content-Encoding") {
+		case "gzip":
+			reader, err := gzip.NewReader(resp.Body)
+			if err != nil {
+				return err
+			}
+			defer reader.Close()
+			body, readErr = ioutil.ReadAll(reader)
+			if readErr != nil {
+				return readErr
+			}
+		default:
+			body, readErr = ioutil.ReadAll(resp.Body)
+			if readErr != nil {
+				return readErr
+			}
+		}
+		return
+	})
+	if err != nil {
+		return
+	}
+	data = body
+	httpstatus = status
+	return
+}
