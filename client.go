@@ -471,6 +471,7 @@ func (c *Client) ResolveTraceRequest(req *http.Request, trace *httptrace.ClientT
 		status int
 	)
 	req.Close = true
+	req = req.WithContext(httptrace.WithClientTrace(context.Background(), trace))
 	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 
 	defer cancel()
@@ -480,7 +481,7 @@ func (c *Client) ResolveTraceRequest(req *http.Request, trace *httptrace.ClientT
 	case "PUT", "POST", "DELETE":
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 	}
-	req = req.WithContext(httptrace.WithClientTrace(ctx, trace))
+	req = req.WithContext(ctx)
 
 	err = c.worker.Execute(req, func(resp *http.Response, err error) (er error) {
 		if err != nil {
