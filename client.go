@@ -479,7 +479,9 @@ func (c *Client) ResolveTraceRequest(req *http.Request, trace *httptrace.ClientT
 
 	switch req.Method {
 	case "PUT", "POST", "DELETE":
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+		if req.Header.Get("Content-Type") == "" {
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+		}
 	}
 	req = req.WithContext(ctx)
 
