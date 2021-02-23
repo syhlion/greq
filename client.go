@@ -471,7 +471,6 @@ func (c *Client) ResolveTraceRequest(req *http.Request, trace *httptrace.ClientT
 		status int
 	)
 	req.Close = true
-	req = req.WithContext(httptrace.WithClientTrace(context.Background(), trace))
 	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 
 	defer cancel()
@@ -484,6 +483,7 @@ func (c *Client) ResolveTraceRequest(req *http.Request, trace *httptrace.ClientT
 		}
 	}
 	req = req.WithContext(ctx)
+	req = req.WithContext(httptrace.WithClientTrace(context.Background(), trace))
 
 	err = c.worker.Execute(req, func(resp *http.Response, err error) (er error) {
 		if err != nil {
