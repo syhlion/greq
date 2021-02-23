@@ -472,6 +472,7 @@ func (c *Client) ResolveTraceRequest(req *http.Request, trace *httptrace.ClientT
 	)
 	req.Close = true
 	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	req = req.WithContext(httptrace.WithClientTrace(ctx, trace))
 
 	defer cancel()
 	c.resolveHeaders(req)
@@ -482,8 +483,6 @@ func (c *Client) ResolveTraceRequest(req *http.Request, trace *httptrace.ClientT
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 		}
 	}
-	req = req.WithContext(ctx)
-	req = req.WithContext(httptrace.WithClientTrace(context.Background(), trace))
 
 	err = c.worker.Execute(req, func(resp *http.Response, err error) (er error) {
 		if err != nil {
