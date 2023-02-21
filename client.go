@@ -292,20 +292,23 @@ func (c *Client) resolveRawRequest(req *http.Request, bb io.Reader, e error) (da
 			stat.Connect = t3.Sub(t0)
 			stat.StartTransfer = t4.Sub(t0)
 			stat.Total = t5.Sub(t0)
-			log.WithFields(log.Fields{
-				"ip":     ip,
-				"name":   "syhlion/greq",
-				"param":  stat.Param,
-				"url":    stat.Url,
-				"method": stat.Method,
-				//	"body":              stat.Body,
-				"tcp_connection":    stat.TCPConnection.String(),
-				"server_processing": stat.ServerProcessing.String(),
-				"content_transfer":  stat.ContentTransfer.String(),
-				"connect":           stat.Connect.String(),
-				"start_transfer":    stat.StartTransfer.String(),
-				"total":             stat.Total.String(),
-			}).Debug("http trace")
+			//slow log
+			if stat.Total > 1*time.Second {
+				log.WithFields(log.Fields{
+					"ip":     ip,
+					"name":   "syhlion/greq",
+					"param":  stat.Param,
+					"url":    stat.Url,
+					"method": stat.Method,
+					//	"body":              stat.Body,
+					"tcp_connection":    stat.TCPConnection.String(),
+					"server_processing": stat.ServerProcessing.String(),
+					"content_transfer":  stat.ContentTransfer.String(),
+					"connect":           stat.Connect.String(),
+					"start_transfer":    stat.StartTransfer.String(),
+					"total":             stat.Total.String(),
+				}).Debug("http trace")
+			}
 
 		}()
 		trace = &httptrace.ClientTrace{
@@ -390,20 +393,23 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 			stat.Connect = t3.Sub(t0)
 			stat.StartTransfer = t4.Sub(t0)
 			stat.Total = t5.Sub(t0)
-			log.WithFields(log.Fields{
-				"ip":     ip,
-				"name":   "syhlion/greq",
-				"param":  stat.Param,
-				"url":    stat.Url,
-				"method": stat.Method,
-				//	"body":              stat.Body,
-				"tcp_connection":    stat.TCPConnection.String(),
-				"server_processing": stat.ServerProcessing.String(),
-				"content_transfer":  stat.ContentTransfer.String(),
-				"connect":           stat.Connect.String(),
-				"start_transfer":    stat.StartTransfer.String(),
-				"total":             stat.Total.String(),
-			}).Debug("http trace")
+			//slow log
+			if stat.Total > 1*time.Second {
+				log.WithFields(log.Fields{
+					"ip":     ip,
+					"name":   "syhlion/greq",
+					"param":  stat.Param,
+					"url":    stat.Url,
+					"method": stat.Method,
+					//	"body":              stat.Body,
+					"tcp_connection":    stat.TCPConnection.String(),
+					"server_processing": stat.ServerProcessing.String(),
+					"content_transfer":  stat.ContentTransfer.String(),
+					"connect":           stat.Connect.String(),
+					"start_transfer":    stat.StartTransfer.String(),
+					"total":             stat.Total.String(),
+				}).Debug("http trace")
+			}
 
 		}()
 		trace = &httptrace.ClientTrace{
