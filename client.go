@@ -6,7 +6,6 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -286,7 +285,6 @@ func (c *Client) resolveRawRequest(req *http.Request, bb io.Reader, e error) (da
 			stat.Method = req.Method
 			stat.Body = string(data)
 			stat.TCPConnection = t3.Sub(t0)
-			fmt.Println(t3.Sub(t0))
 			stat.ServerProcessing = t4.Sub(t3)
 			stat.ContentTransfer = t5.Sub(t4)
 			stat.Connect = t3.Sub(t0)
