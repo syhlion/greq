@@ -291,7 +291,7 @@ func (c *Client) resolveRawRequest(req *http.Request, bb io.Reader, e error) (da
 			stat.StartTransfer = t4.Sub(t0)
 			stat.Total = t5.Sub(t0)
 			//slow log
-			if stat.Total > 1*time.Second {
+			if stat.Total > 2*time.Second {
 				log.WithFields(log.Fields{
 					"ip":     ip,
 					"name":   "syhlion/greq",
@@ -392,7 +392,7 @@ func (c *Client) resolveRequest(req *http.Request, params url.Values, e error) (
 			stat.StartTransfer = t4.Sub(t0)
 			stat.Total = t5.Sub(t0)
 			//slow log
-			if stat.Total > 1*time.Second {
+			if stat.Total > 2*time.Second {
 				log.WithFields(log.Fields{
 					"ip":     ip,
 					"name":   "syhlion/greq",
